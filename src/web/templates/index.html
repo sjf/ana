@@ -1,0 +1,30 @@
+<!doctype html>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='app.css') }}" />
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+
+<title>Hello from Flask</title>
+<body onload="start_game();">
+<script>
+  word={{ word|tojson }};
+  subs={{ subs|tojson }};
+</script>
+  <h1>Hello, World!</h1>
+  <div id="timer">3:00</div>
+  <div id="word">{{ word }}</div>
+
+  <div id="form"><form autocomplete="off" onsubmit="handle_form();return false">
+    <input id="input"></input>
+  </form></div>
+  <p>
+  <div id="score">Score: <span id="score_value">0</span></div>
+  <div id="result_title">Words:</div>
+  <div id="accepted"></div>
+  <p>
+  <div id="result_title">Rejected:</div>
+  <div id="rejected"></div>
+
+  <div id="result_title">Missed:</div>
+  <div id="answer"></div>
+
+</body>
+</html>
