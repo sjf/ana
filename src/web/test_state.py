@@ -14,7 +14,8 @@ def test_game_state_serialization():
   g2=GameState.deserialize(s)
 
   assert g == g2
-  assert g.id.startswith('game-')
+  assert g.id.startswith(b'game-')
+  assert 10 == GameState.end_time(g.id)
 
 def test_client_state_serialization():
   c = ClientState('client-1234')
@@ -27,4 +28,4 @@ def test_client_state_serialization():
   c2=ClientState.deserialize(s)
 
   assert c == c2
-  assert c.id.startswith('client-')
+  assert c.id.startswith(b'client-')

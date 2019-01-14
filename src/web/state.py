@@ -3,7 +3,7 @@ from lib import *
 
 class GameState:
   def __init__(self, start_time, end_time, word, subs):
-    self.id = 'game-' + uid() + '-' + word
+    self.id = bytes('game-' + str(end_time) + '-' + uid() + '-' + word, 'utf8')
     self.start_time = start_time
     self.end_time = end_time
     self.word = word
@@ -16,13 +16,19 @@ class GameState:
   def deserialize(obj):
     return pickle.loads(obj)
 
+  @staticmethod
+  def end_time(key):
+    if not key.startswith(b'game-') or key.count(b'-') < 3:
+      raise Exception('Invalid game key: ' + key)
+    return int(key.split(b'-')[1])
+
   def update_client_state(self, client):
     self.client_states[client.id] = client
 
   def remaining_secs(self):
-    log('start:', self.start_time)
-    log('end:  ', self.end_time)
-    log('now:  ', now())
+    # log('start:', self.start_time)
+    # log('end:  ', self.end_time)
+    # log('now:  ', now())
     return (self.end_time - now()) // 1000
 
   def __repr__(self):
@@ -35,7 +41,7 @@ class GameState:
 
 class ClientState:
   def __init__(self, id_):
-    self.id = 'client-' + id_
+    self.id =  bytes('client-' + id_, 'utf8')
     self.accepted = []
     self.rejected = []
 
