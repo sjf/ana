@@ -1,11 +1,11 @@
-TIME_LIMIT = 180
 import pickle
+from lib import *
 
 class GameState:
-  def __init__(self, id_, start_time, time_limit, word, subs):
-    self.id = id_
+  def __init__(self, start_time, end_time, word, subs):
+    self.id = 'game-' + uid() + '-' + word
     self.start_time = start_time
-    self.end_time = start_time + time_limit
+    self.end_time = end_time
     self.word = word
     self.subs = subs
     self.client_states = {}
@@ -19,6 +19,12 @@ class GameState:
   def update_client_state(self, client):
     self.client_states[client.id] = client
 
+  def remaining_secs(self):
+    log('start:', self.start_time)
+    log('end:  ', self.end_time)
+    log('now:  ', now())
+    return (self.end_time - now()) // 1000
+
   def __repr__(self):
     return 'GameState' + repr(self.__dict__)
 
@@ -29,7 +35,7 @@ class GameState:
 
 class ClientState:
   def __init__(self, id_):
-    self.id = id_
+    self.id = 'client-' + id_
     self.accepted = []
     self.rejected = []
 

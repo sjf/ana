@@ -1,8 +1,6 @@
 'use strict';
 
-var TIME_SECS=180;
-
-var start_time;
+var end_time;
 var timer;
 var accepted;
 var rejected;
@@ -28,7 +26,7 @@ function pad(num, len) {
 function start_game(){
   accepted = [];
   rejected = [];
-  start_time = get_timestamp();
+  end_time = get_timestamp() + server_remaining_secs;
   timer = setInterval(update_time, 500); // 0.5 secs
   document.getElementById("input").disabled = false;
 }
@@ -37,11 +35,10 @@ function end_game() {
   disable_form();
   clearInterval(timer);
   var answerElem = document.getElementById("answer");
-  
 }
 
 function update_time() {
-  var remaining = Math.max(TIME_SECS - (get_timestamp() - start_time), 0);
+  var remaining = end_time - get_timestamp();
   var mins = Math.floor(remaining / 60);
   var secs = remaining % 60;
   var txt = mins + ":" + pad(secs, 2);
