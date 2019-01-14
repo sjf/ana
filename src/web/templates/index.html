@@ -1,9 +1,9 @@
 <!doctype html>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='app.css') }}" />
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 <script src="{{ url_for('static', filename='app.js') }}"></script>
 
 <title>Hello from Flask</title>
-<body onload="start_game();">
 <script>
   word={{ game.word|tojson }};
   subs={{ game.subs|tojson }};
@@ -13,7 +13,7 @@
   <div id="timer">0:00</div>
   <div id="word">{{ game.word }}</div>
 
-  <div id="form"><form autocomplete="off" onsubmit="handle_form();return false">
+  <div id="form"><form autocomplete="off">
     <input id="input"></input>
   </form></div>
   <p>
