@@ -7,6 +7,7 @@
 
 <title>Hello from Flask</title>
 <script>
+  game_id = {{ game.id|tojson }};
   word={{ game.word|tojson }};
   subs={{ game.subs|tojson }};
   server_remaining_secs = {{ game.remaining_secs()|tojson}}

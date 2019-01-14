@@ -24,8 +24,6 @@ function pad(num, len) {
   return "0".repeat(len - str.length) + str 
 }
 
-
-
 function end_game() {
   disable_form();
   clearInterval(timer);
@@ -49,8 +47,9 @@ function disable_form() {
 
 $(document).ready(function() {
   $("form").on("submit", handle_form);
-  socket = io.connect('http://' + document.domain + ':' + location.port + '/');
+  socket = io.connect('http://' + document.domain + ':' + location.port + '/', {query: game_id});
 
+  // Init fields from server settings
   accepted = [];
   rejected = [];
   end_time = get_timestamp() + server_remaining_secs;
@@ -61,12 +60,14 @@ $(document).ready(function() {
 
 function handle_form() {
   event.preventDefault();
-  console.log('handle');
 
+  // Read and clear input field
   var txt = $("input").val();
   $("input").val("")
-  rejected = [];
   var words = txt.split(/, /);
+
+  // Process input
+  rejected = []; // Rejected field is reset after every submission
   words.forEach(function (word) {
     if (subs.includes(word)) {
       if (!accepted.includes(word)) {
@@ -77,6 +78,7 @@ function handle_form() {
     }
   });
 
+  // Update UI
   $("#accepted").html(accepted.join(", ")); // not sanitised
   $("#rejected").html(rejected.join(", ")); // not sanitised
   $("#score_value").html(calculate_score());
@@ -89,5 +91,5 @@ function calculate_score() {
   accepted.forEach(function (word) {
     score += word.length;
   });
-  return score;
+  return score * 10;
 }
