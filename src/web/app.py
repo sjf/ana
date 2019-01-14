@@ -8,7 +8,7 @@ from state import *
 WORD_LIST='../data/subwords.txt'
 REDIS='localhost:6379'
 TIME_LIMIT_MS = 180 * 1000 # 3 minutes
-FLASK_SECRET_KEY = b'_5#y2L"F4Q8z\n\xec]/'
+FLASK_SECRET_KEY = b'_5#y2L"F4Q8z\n\xec]/' # should be secret
 
 
 def load_word_list(f):
@@ -56,6 +56,7 @@ app.secret_key = FLASK_SECRET_KEY
 words = load_word_list(WORD_LIST)
 keys = list(words.keys())
 redis_db = redis.from_url(REDIS)
+redis_db.flushall() # reset database during development
 
 @app.route('/')
 def index():
