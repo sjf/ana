@@ -4,6 +4,7 @@ var end_time;
 var timer;
 var accepted;
 var rejected;
+var socket;
 
 /** 
  * Return the current time in seconds since the epoch.
@@ -48,6 +49,7 @@ function disable_form() {
 
 $(document).ready(function() {
   $("form").on("submit", handle_form);
+  socket = io.connect('http://' + document.domain + ':' + location.port + '/');
 
   accepted = [];
   rejected = [];
@@ -77,7 +79,9 @@ function handle_form() {
 
   $("#accepted").html(accepted.join(", ")); // not sanitised
   $("#rejected").html(rejected.join(", ")); // not sanitised
-  $("#score_value").html(calculate_score()); 
+  $("#score_value").html(calculate_score());
+
+  return false;
 }
 
 function calculate_score() {
