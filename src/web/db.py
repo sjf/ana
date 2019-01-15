@@ -13,38 +13,64 @@ class Db:
   def __init__(self, host, port):
     self.redis_db = redis.StrictRedis(host=host, port=port)
 
-  def put(self, item):
-    self.redis_db.set(item.id, item.serialize())
+  def put(self, item, pipe=None):
+    if not pipe: pipe = self.redis_db
 
-  def get_game(self, id_):
+    pipe.set(item.id, item.serialize())
+
+  def get_game(self, id_, pipe=None):
+    if not pipe: pipe = self.redis_db
+
     if not id_.startswith('game-'):
       raise Exception('Not client key')
-    val = self.redis_db.get(id_)
+
+    val = pipe.get(id_)
+
     if not val:
       return None  
     return GameState.deserialize(val)
 
-  def get_client_game(self, id_):
+  def get_client_game(self, id_, pipe=None):
+    if not pipe: pipe = self.redis_db
     if not id_.startswith('client-'):
       raise Exception('Not client key')
-    game_id = _tostr(self.redis_db.get(id_))
+
+    game_id = _tostr(pipe.get(id_))
     if not game_id:
       return None
-    return self.get_game(game_id)
+    return self.get_game(game_id, pipe)
 
-  def set_client_game(self, id_, game):
+  def set_client_game(self, id_, game, pipe=None):
+    if not pipe: pipe = self.redis_db
+
     if not id_.startswith('client-'):
       raise Exception('Not client key')
-    self.redis_db.set(id_, game.id)
+    pipe.set(id_, game.id)
 
-  def get_latest_game(self, minimum_end_time):
+  def get_latest_game(self, minimum_end_time, pipe=None):
+    if not pipe: pipe = self.redis_db
+
     mx = '' # Get the key with largest time stamp
-    for key in self.redis_db.scan_iter('game-*'):
+    for key in pipe.scan_iter('game-*'):
       mx = max(_tostr(key), mx)
     if not mx:
       return None
     end_time = Key.end_time(mx)
     if end_time > minimum_end_time: 
-      return self.get_game(mx)
+      return self.get_game(mx, pipe)
     return None
+
+  def update_client_state(self, client_game_id, client_state):
+    def _update_client_state(pipe):
+      game_state = self.get_client_game(client_state.id, pipe)
+      if not game_state or game_state.id != client_game_id:
+        log('Incorrect game id for client', client_state.id, client_game_id);
+        return False
+      game_state.update_client_state(client_state)
+      self.put(game_state, pipe)
+    try:
+      self.redis_db.transaction(_update_client_state, client_game_id, client_state.id)
+    except redis.WatchError as e:
+      log(e)
+      return False
 

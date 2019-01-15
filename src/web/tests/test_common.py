@@ -1,12 +1,7 @@
 from web.state import *
 
-def client(n=1234):
-  c = ClientState('client-' + str(n))
-  c.accepted.append('asdf123')
-  c.accepted.append('asdf456')
-  c.rejected.append('bbb123')
-  c.rejected.append('bbb456')
-  return c
+def client(n=1234, accepted = ['asdf123', 'asdf456'], rejected = ['bbb123', 'bbb456']):
+  return ClientState('client-' + str(n), accepted, rejected)
 
 def game(endtime=1234):
   c1 = client(111)

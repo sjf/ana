@@ -24,6 +24,14 @@ function pad(num, len) {
   return "0".repeat(len - str.length) + str 
 }
 
+function is_lowercase_ascii(w) {
+  return /[a-z]/.test(w);
+}
+
+function is_text(w) {
+  return /[a-z, ]/.test(w);
+}
+
 function end_game() {
   disable_form();
   clearInterval(timer);
@@ -46,14 +54,13 @@ function disable_form() {
 }
 
 $(document).ready(function() {
+  socket = io.connect('http://' + document.domain + ':' + location.port + '/');//, {query: game_id});
   $("form").on("submit", handle_form);
-  socket = io.connect('http://' + document.domain + ':' + location.port + '/', {query: game_id});
 
-  // Init fields from server settings
-  accepted = [];
-  rejected = [];
   end_time = get_timestamp() + server_remaining_secs;
   timer = setInterval(update_time, 500); // 0.5 secs
+  // Update fields from server values
+  update_ui(); 
   $("#input").disable = false;
 });
 
@@ -64,26 +71,38 @@ function handle_form() {
   // Read and clear input field
   var txt = $("input").val();
   $("input").val("")
-  var words = txt.split(/, /);
+  var words = txt.toLowerCase().split(/, /);
 
   // Process input
-  rejected = []; // Rejected field is reset after every submission
   words.forEach(function (word) {
     if (subs.includes(word)) {
       if (!accepted.includes(word)) {
         accepted.push(word);
       }
-    } else if (!rejected.includes(word)) {
+    } else if (is_lowercase_ascii(word) && !rejected.includes(word)) {
         rejected.push(word);
     }
   });
-
-  // Update UI
-  $("#accepted").html(accepted.join(", ")); // not sanitised
-  $("#rejected").html(rejected.join(", ")); // not sanitised
-  $("#score_value").html(calculate_score());
+  // Send complete client state to the server.
+  var data = JSON.stringify({'game_id':game_id, 'accepted':accepted, 'rejected':rejected})
+  socket.emit('submit', data)
+  console.log('Submitted ' + data)
+  update_ui()
 
   return false;
+}
+
+function update_ui() {
+  var atxt = accepted.join(", ");
+  var rtxt = rejected.join(", ");
+  // Only display lower case ascii plus comma and
+  if (is_text(atxt)) {
+    $("#accepted").html(atxt); 
+  } 
+  if (is_text(rtxt)) {
+    $("#rejected").html(rtxt);
+  }
+  $("#score_value").html(calculate_score());
 }
 
 function calculate_score() {

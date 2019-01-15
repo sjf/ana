@@ -12,5 +12,5 @@ class Key:
     return 'game-' + str(end_time) + '-' + uid() + '-' + word
 
   @staticmethod
-  def ClientKey(id_):
-    return 'client-' + id_
+  def ClientKey():
+    return 'client-' + uid()

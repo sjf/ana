@@ -10,6 +10,8 @@
   game_id = {{ game.id|tojson }};
   word={{ game.word|tojson }};
   subs={{ game.subs|tojson }};
+  accepted = {{ client.accepted|tojson }};
+  rejected = {{ client.rejected|tojson }};
   server_remaining_secs = {{ game.remaining_secs()|tojson}}
 </script>
   <h1>Hello, World!</h1>

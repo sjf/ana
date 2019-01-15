@@ -17,8 +17,12 @@ class GameState:
   def deserialize(obj):
     return pickle.loads(obj)
 
-  def update_client_state(self, client):
-    self.client_states[client.id] = client
+  def update_client_state(self, new_client):
+    if not new_client.id in self.client_states:
+      self.client_states[new_client.id] = new_client
+    else:
+      client = self.client_states[new_client.id]
+      client.update(new_client)
 
   def remaining_secs(self):
     return (self.end_time - now()) // 1000
@@ -32,10 +36,10 @@ class GameState:
     return self.__dict__ == other.__dict__
 
 class ClientState:
-  def __init__(self, id_):
-    self.id = Key.ClientKey(id_)
-    self.accepted = []
-    self.rejected = []
+  def __init__(self, id_, accepted=[], rejected=[]):
+    self.id = id_
+    self.accepted = accepted[:]
+    self.rejected = rejected[:]
 
   def serialize(self):
     return pickle.dumps(self)
@@ -50,3 +54,12 @@ class ClientState:
     if type(self) != type(other):
       return False
     return self.__dict__ == other.__dict__
+
+  def update(self, other):
+    update(self.accepted, other.accepted)
+    update(self.rejected, other.rejected)
+
+def update(l1, l2):
+  for x in l2:
+    if x not in l1:
+      l1.append(x)
