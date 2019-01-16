@@ -24,6 +24,12 @@ class GameState:
       client = self.client_states[new_client.id]
       client.update(new_client)
 
+  def has_client(self, client_id):
+    return client_id in self.client_states
+
+  def client(self, client_id):
+    return self.client_states[client_id]
+
   def remaining_secs(self):
     return (self.end_time - now()) // 1000
 

@@ -40,7 +40,15 @@ class Db:
       return None
     return self.get_game(game_id, pipe)
 
+  def add_client_to_game(self, game, client, pipe=None):
+    assert isinstance(game, GameState)
+    assert isinstance(client, ClientState)
+
+    self.redis_db.set(client.id, game.id)
+    return self.update_client_state(game.id, client)
+
   def set_client_game(self, id_, game, pipe=None):
+    assert isinstance(game, GameState)
     if not pipe: pipe = self.redis_db
 
     if not id_.startswith('client-'):
@@ -60,17 +68,21 @@ class Db:
       return self.get_game(mx, pipe)
     return None
 
-  def update_client_state(self, client_game_id, client_state):
+  def update_client_state(self, game_id, client_state):
+    game_state = None
     def _update_client_state(pipe):
+      nonlocal game_state
       game_state = self.get_client_game(client_state.id, pipe)
-      if not game_state or game_state.id != client_game_id:
-        log('Incorrect game id for client', client_state.id, client_game_id);
-        return False
+      if not game_state or game_state.id != game_id:
+        log('Incorrect game id for client', client_state.id, game_id);
+        game_state = None # return value
+        return
       game_state.update_client_state(client_state)
       self.put(game_state, pipe)
     try:
-      self.redis_db.transaction(_update_client_state, client_game_id, client_state.id)
+      self.redis_db.transaction(_update_client_state)
+      return game_state
     except redis.WatchError as e:
       log(e)
-      return False
+      return None
 

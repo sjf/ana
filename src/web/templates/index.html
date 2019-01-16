@@ -7,12 +7,14 @@
 
 <title>Hello from Flask</title>
 <script>
+  client_id = {{ client.id|tojson }}
   game_id = {{ game.id|tojson }};
   word={{ game.word|tojson }};
   subs={{ game.subs|tojson }};
   accepted = {{ client.accepted|tojson }};
   rejected = {{ client.rejected|tojson }};
-  server_remaining_secs = {{ game.remaining_secs()|tojson}}
+  server_remaining_secs = {{ game.remaining_secs()|tojson}};
+  others = {{ game.other_players_scores(client.id)|tojson }}
 </script>
   <h1>Hello, World!</h1>
   <div id="timer">0:00</div>
@@ -31,6 +33,9 @@
 
   <div id="result_title">Missed:</div>
   <div id="answer"></div>
+
+  <id id="others_title">Other players</div>
+  <div id="others"></div>
 
 </body>
 </html>

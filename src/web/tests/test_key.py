@@ -1,7 +1,7 @@
 from web.key import *
 
 def test_key():
-  c = Key.ClientKey('asdf')
+  c = Key.ClientKey()
   assert c.startswith('client-')
 
   g = Key.GameKey(1234, 'foo')

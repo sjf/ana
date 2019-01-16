@@ -13,8 +13,12 @@ def redis_db():
   yield redis
   redis.stop()
 
+def new(redis_db):
+  return Db(redis_db.dsn()['host'], redis_db.dsn()['port'])
+
+
 def test_put_get_game(redis_db):
-  db = Db(redis_db.dsn()['host'], redis_db.dsn()['port'])
+  db = new(redis_db)
 
   g = game()
   db.put(g)
@@ -22,7 +26,7 @@ def test_put_get_game(redis_db):
   assert g == db.get_game(g.id)
 
 def test_set_and_get_client_game(redis_db):
-  db = Db(redis_db.dsn()['host'], redis_db.dsn()['port'])
+  db = new(redis_db)
 
   id_ = 'client-1234'
   g = game()
@@ -33,7 +37,7 @@ def test_set_and_get_client_game(redis_db):
   assert g == db.get_client_game(id_)
 
 def test_get_latest_game(redis_db):
-  db = Db(redis_db.dsn()['host'], redis_db.dsn()['port'])
+  db = new(redis_db)
   assert None == db.get_latest_game(9999)
 
   g1 = game(1234)
@@ -47,7 +51,7 @@ def test_get_latest_game(redis_db):
   assert g3 == db.get_latest_game(7889)
 
 def test_update_client_state(redis_db):
-  db = Db(redis_db.dsn()['host'], redis_db.dsn()['port'])
+  db = new(redis_db)
   g = game()
   g.client_states = {}
   db.put(g)
