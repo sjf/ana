@@ -14,10 +14,10 @@
   accepted = {{ client.accepted|tojson }};
   rejected = {{ client.rejected|tojson }};
   server_remaining_secs = {{ game.remaining_secs()|tojson}};
-  others = {{ game.other_players_scores(client.id)|tojson }}
+  others = {{ other_players_scores|tojson }}
 </script>
   <h1>Hello, World!</h1>
-  <div id="timer">0:00</div>
+  <div id="timer">-:--</div>
   <div id="word">{{ game.word }}</div>
 
   <div id="form"><form autocomplete="off">

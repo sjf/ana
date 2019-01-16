@@ -48,8 +48,8 @@ class Game:
     game_state = self.db.add_client_to_game(game_state, client)
     return game_state, client
 
-  def get_game(self, client_id):
-    return self.db.get_client_game(client_id)
+  def update_client_from_submit(self, game_id, client):
+    return self.db.update_client_state(game_id, client)
 
   def _pick_word(self):
     word = self.keys[randint(0, len(self.keys)-1)]
